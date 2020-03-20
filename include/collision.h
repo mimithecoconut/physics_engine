@@ -18,8 +18,8 @@ typedef struct {
      * Normal impulses are applied along this axis.
      * If collided is false, this value is undefined.
      */
-    Vector axis;
-} CollisionInfo;
+    vector_t axis;
+} collision_info_t;
 
 /**
  * Computes the status of the collision between two convex polygons.
@@ -32,6 +32,6 @@ typedef struct {
  * @return whether the shapes are colliding, and if so, the collision axis.
  * The axis should be a unit vector pointing from shape1 towards shape2.
  */
-CollisionInfo find_collision(List *shape1, List *shape2);
+collision_info_t find_collision(list_t *shape1, list_t *shape2);
 
 #endif // #ifndef __COLLISION_H__
