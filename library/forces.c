@@ -46,8 +46,9 @@ void collision_creator(void *aux) {
   }
 }
 
-void impulse_creator(void *aux, double elasticity) {
+void impulse_creator(void *aux) {
   vector_t collision_axis = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape).axis;
+  double elasticity = ((aux_t*) aux)->constant;
   body_t *bod1 = ((aux_t *) aux)->body1;
   body_t *bod2 = ((aux_t *) aux)->body2;
   double m_a = body_get_mass(bod1);
@@ -113,7 +114,7 @@ void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2) 
 
 void create_physics_collision(scene_t *scene, double elasticity, body_t *body1, body_t *body2) {
   aux_t *aux = malloc(sizeof(aux_t));
-  aux->constant = 0;
+  aux->constant = elasticity;
   aux->body1 = body1;
   aux->body2 = body2;
   list_t *b_list = list_init(2, (free_func_t)body_free);
