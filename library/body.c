@@ -96,6 +96,10 @@ void body_set_color(body_t *body, rgb_color_t c) {
   body->color = c;
 }
 
+void body_set_mass(body_t *body, double mass) {
+  body->mass = mass;
+}
+
 void body_set_rotation(body_t *body, double angle) {
   polygon_rotate(body->shape, angle - body->orientation, body->centroid);
   body->centroid = polygon_centroid(body->shape);

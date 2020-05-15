@@ -40,7 +40,7 @@ void drag_creator(void *aux) {
 }
 
 void collision_creator(void *aux) {
-  if (find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape)) {
+  if ((find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape)).collided) {
     body_remove(((aux_t*) aux)->body1);
     body_remove(((aux_t*) aux)->body2);
   }
@@ -83,4 +83,13 @@ void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2) 
   list_add(b_list, body2);
   scene_add_bodies_force_creator(scene, (force_creator_t) collision_creator, \
   aux, b_list, free);
+}
+
+void create_physics_collision(
+    scene_t *scene,
+    double elasticity,
+    body_t *body1,
+    body_t *body2
+) {
+  
 }

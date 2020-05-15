@@ -162,6 +162,14 @@ void body_set_velocity(body_t *body, vector_t v);
 void body_set_color(body_t *body, rgb_color_t c);
 
 /**
+ * Changes a body's mass.
+ *
+ * @param body a pointer to a body returned from body_init()
+ * @param mass the body's new mass
+ */
+void body_set_mass(body_t *body, double mass);
+
+/**
  * Changes a body's orientation in the plane.
  * The body is rotated about its center of mass.
  * Note that the angle is *absolute*, not relative to the current orientation.

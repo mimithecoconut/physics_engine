@@ -7,7 +7,7 @@
 #include "vector.h"
 #include <assert.h>
 
-bool find_collision(list_t *shape1, list_t *shape2) {
+collision_info_t find_collision(list_t *shape1, list_t *shape2) {
   list_t *axes = get_axes2(shape1, shape2);
   for (size_t i = 0; i < list_size(axes); i++) {
     double min1 = polygon_proj_min(shape1, list_get(axes, i));
@@ -15,10 +15,10 @@ bool find_collision(list_t *shape1, list_t *shape2) {
     double min2 = polygon_proj_min(shape2, list_get(axes, i));
     double max2 = polygon_proj_max(shape2, list_get(axes, i));
     if ((max2 < min1) || (max1 < min2)) {
-      return false;
+      return (collision_info_t){false, {0,0}};
     }
   }
-  return true;
+  return (collision_info_t){true, {0,0}};
 }
 
 vector_t *edge_perp(vector_t *vec) {
