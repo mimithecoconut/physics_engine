@@ -55,9 +55,21 @@ void impulse_creator(void *aux, double elasticity) {
   double u_a = vec_dot(body_get_velocity(bod1), collision_axis);
   double u_b = vec_dot(body_get_velocity(bod2), collision_axis);
   double impulse = ((m_a * m_b)/(m_a + m_b)) * (1 + elasticity) * (u_b - u_a);
+  if (m_a == INFINITY) {
+    impulse = m_b * (1 + elasticity) * (u_b - u_a);
+  }
+  else if (m_b == INFINITY) {
+    impulse = m_a * (1 + elasticity) * (u_b - u_a);
+  }
   vector_t vec_impulse = vec_multiply(impulse, collision_axis);
-  body_add_impulse(bod1, vec_impulse);
-  body_add_impulse(bod2, vec_multiply(-1, vec_impulse));
+  collision_info_t info = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape);
+  if (info.collided_last_tick == false) {
+    body_add_impulse(bod1, vec_impulse);
+    body_add_impulse(bod2, vec_multiply(-1, vec_impulse));
+  }
+  else {
+    info.collided_last_tick = false;
+  }
 }
 
 void create_newtonian_gravity(scene_t *scene, double g, body_t *body1, body_t *body2) {

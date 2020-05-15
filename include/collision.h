@@ -23,6 +23,8 @@ typedef struct {
      * If collided is false, this value is undefined.
      */
     vector_t axis;
+    /** Whether the two shapes collided before in previous tick */
+    bool collided_last_tick;
 } collision_info_t;
 
 /**

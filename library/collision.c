@@ -20,7 +20,7 @@ collision_info_t find_collision(list_t *shape1, list_t *shape2) {
     double min2 = polygon_proj_min(shape2, list_get(axes, i));
     double max2 = polygon_proj_max(shape2, list_get(axes, i));
     if ((max2 < min1) || (max1 < min2)) {
-      return (collision_info_t){false, {0,0}};
+      return (collision_info_t){false, {0,0}, false};
     }
     else {
       double min = find_min(fabs(max2 - min1), fabs(max1 - min2));
@@ -30,7 +30,7 @@ collision_info_t find_collision(list_t *shape1, list_t *shape2) {
       }
     }
   }
-  return (collision_info_t){true, *collision_axis};
+  return (collision_info_t){true, *collision_axis, true};
 }
 
 double find_min(double first, double second) {
