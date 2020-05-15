@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 #include "list.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "body.h"
 #include "vector.h"
 
 /**
@@ -33,5 +36,17 @@ typedef struct {
  * The axis should be a unit vector pointing from shape1 towards shape2.
  */
 collision_info_t find_collision(list_t *shape1, list_t *shape2);
+
+vector_t *edge_perp(vector_t *vec);
+
+list_t *get_axes1(list_t *shape);
+
+list_t *get_axes2(list_t *shape1, list_t *shape2);
+
+double vertex_proj(vector_t *vertex, vector_t *line);
+
+double polygon_proj_min(list_t *shape, vector_t *line);
+
+double polygon_proj_max(list_t *shape, vector_t *line);
 
 #endif // #ifndef __COLLISION_H__

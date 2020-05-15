@@ -2,6 +2,17 @@
 #define __FORCES_H__
 
 #include "scene.h"
+#include "collision.h"
+
+/**
+ * Structure to store miscellaneous information about bodies to which a force
+ * is applied and constant for the force
+ */
+ typedef struct aux {
+   double constant;
+   body_t *body1;
+   body_t *body2;
+ } aux_t;
 
 /**
  * A function called when a collision occurs.
@@ -13,6 +24,50 @@
  */
 typedef void (*collision_handler_t)
     (body_t *body1, body_t *body2, vector_t axis, void *aux);
+
+/**
+ * Calculates the force of gravity on the given objects and applies the force
+ * to them
+ *
+ * @param aux struct containing information about bodies to apply force and
+ * constants
+ */
+void gravity_creator(void *aux);
+
+/**
+ * Calculates the spring force on the given objects and applies the force
+ * to them
+ *
+ * @param aux struct containing information about bodies to apply force and
+ * constants
+ */
+void spring_creator(void *aux);
+
+/**
+ * Calculates the force of drag on the given object and applies the force
+ * to it
+ *
+ * @param aux struct containing information about body to apply force and
+ * constants
+ */
+void drag_creator(void *aux);
+
+/**
+ * Adds a force creator to a scene that applies gravity between two bodies.
+ * The force creator will be called each tick
+ * to compute the Newtonian gravitational force between the bodies.
+ * See
+ * https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation#Vector_form.
+ * The force should not be applied when the bodies are very close,
+ * because its magnitude blows up as the distance between the bodies goes to 0.
+ *
+ * @param scene the scene containing the bodies
+ * @param g the gravitational proportionality constant
+ * @param body1 the first body
+ * @param body2 the second body
+ */
+
+void collision_creator(void *aux);
 
 /**
  * Adds a force creator to a scene that applies gravity between two bodies.
