@@ -82,6 +82,9 @@ void collision_creator(void *aux);
  * @param body1 the first body
  * @param body2 the second body
  */
+
+void impulse_creator(void *aux, double elasticity);
+
 void create_newtonian_gravity(scene_t *scene, double G, body_t *body1, body_t *body2);
 
 /**

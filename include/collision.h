@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "body.h"
 #include "vector.h"
+#include <math.h>
 
 /**
  * Represents the status of a collision between two shapes.
@@ -36,6 +37,8 @@ typedef struct {
  * The axis should be a unit vector pointing from shape1 towards shape2.
  */
 collision_info_t find_collision(list_t *shape1, list_t *shape2);
+
+double find_min(double first, double second);
 
 vector_t *edge_perp(vector_t *vec);
 

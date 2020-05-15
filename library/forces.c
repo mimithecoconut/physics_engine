@@ -46,6 +46,20 @@ void collision_creator(void *aux) {
   }
 }
 
+void impulse_creator(void *aux, double elasticity) {
+  vector_t collision_axis = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape).axis;
+  body_t *bod1 = ((aux_t *) aux)->body1;
+  body_t *bod2 = ((aux_t *) aux)->body2;
+  double m_a = body_get_mass(bod1);
+  double m_b = body_get_mass(bod2);
+  double u_a = vec_dot(body_get_velocity(bod1), collision_axis);
+  double u_b = vec_dot(body_get_velocity(bod2), collision_axis);
+  double impulse = ((m_a * m_b)/(m_a + m_b)) * (1 + elasticity) * (u_b - u_a);
+  vector_t vec_impulse = vec_multiply(impulse, collision_axis);
+  body_add_impulse(bod1, vec_impulse);
+  body_add_impulse(bod2, vec_multiply(-1, vec_impulse));
+}
+
 void create_newtonian_gravity(scene_t *scene, double g, body_t *body1, body_t *body2) {
   aux_t *aux = malloc(sizeof(aux_t));
   aux->constant = g;
@@ -85,11 +99,14 @@ void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2) 
   aux, b_list, free);
 }
 
-void create_physics_collision(
-    scene_t *scene,
-    double elasticity,
-    body_t *body1,
-    body_t *body2
-) {
-  
+void create_physics_collision(scene_t *scene, double elasticity, body_t *body1, body_t *body2) {
+  aux_t *aux = malloc(sizeof(aux_t));
+  aux->constant = 0;
+  aux->body1 = body1;
+  aux->body2 = body2;
+  list_t *b_list = list_init(2, (free_func_t)body_free);
+  list_add(b_list, body1);
+  list_add(b_list, body2);
+  scene_add_bodies_force_creator(scene, (force_creator_t) impulse_creator, \
+  aux, b_list, free);
 }

@@ -6,9 +6,14 @@
 #include "body.h"
 #include "vector.h"
 #include <assert.h>
+#include <math.h>
+
+const int LARGE = 99999;
 
 collision_info_t find_collision(list_t *shape1, list_t *shape2) {
   list_t *axes = get_axes2(shape1, shape2);
+  int overlap = LARGE;
+  vector_t *collision_axis = malloc(sizeof(vector_t));
   for (size_t i = 0; i < list_size(axes); i++) {
     double min1 = polygon_proj_min(shape1, list_get(axes, i));
     double max1 = polygon_proj_max(shape1, list_get(axes, i));
@@ -17,10 +22,23 @@ collision_info_t find_collision(list_t *shape1, list_t *shape2) {
     if ((max2 < min1) || (max1 < min2)) {
       return (collision_info_t){false, {0,0}};
     }
+    else {
+      double min = find_min(fabs(max2 - min1), fabs(max1 - min2));
+      if (min < overlap) {
+        overlap = min;
+        *collision_axis = *(vector_t *)(list_get(axes, i));
+      }
+    }
   }
-  return (collision_info_t){true, {0,0}};
+  return (collision_info_t){true, *collision_axis};
 }
 
+double find_min(double first, double second) {
+  if (first < second) {
+    return first;
+  }
+  return second;
+}
 vector_t *edge_perp(vector_t *vec) {
   vector_t *vec_normal = malloc(sizeof(vector_t));
   vec_normal->x =  -1 * vec->y;
