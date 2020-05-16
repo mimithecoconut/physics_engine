@@ -23,8 +23,8 @@ typedef struct {
      * If collided is false, this value is undefined.
      */
     vector_t axis;
-    /** Whether the two shapes collided before in previous tick */
-    bool collided_last_tick;
+    // // /** Whether the two shapes collided before in previous tick */
+    //  bool collided_last_tick;
 } collision_info_t;
 
 /**
@@ -42,16 +42,14 @@ collision_info_t find_collision(list_t *shape1, list_t *shape2);
 
 double find_min(double first, double second);
 
-vector_t *edge_perp(vector_t *vec);
+vector_t *edge_perp(vector_t vec);
 
 list_t *get_axes1(list_t *shape);
 
 list_t *get_axes2(list_t *shape1, list_t *shape2);
 
-double vertex_proj(vector_t *vertex, vector_t *line);
+double polygon_proj_min(list_t *shape, vector_t line);
 
-double polygon_proj_min(list_t *shape, vector_t *line);
-
-double polygon_proj_max(list_t *shape, vector_t *line);
+double polygon_proj_max(list_t *shape, vector_t line);
 
 #endif // #ifndef __COLLISION_H__

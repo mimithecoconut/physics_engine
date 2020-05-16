@@ -13,24 +13,26 @@ const int LARGE = 99999;
 collision_info_t find_collision(list_t *shape1, list_t *shape2) {
   list_t *axes = get_axes2(shape1, shape2);
   int overlap = LARGE;
-  vector_t *collision_axis = malloc(sizeof(vector_t));
+  vector_t collision_axis = {0.0, 0.0};
+  collision_info_t info = (collision_info_t){false, collision_axis};
+  //vector_t *collision_axis = malloc(sizeof(vector_t));
   for (size_t i = 0; i < list_size(axes); i++) {
-    double min1 = polygon_proj_min(shape1, list_get(axes, i));
-    double max1 = polygon_proj_max(shape1, list_get(axes, i));
-    double min2 = polygon_proj_min(shape2, list_get(axes, i));
-    double max2 = polygon_proj_max(shape2, list_get(axes, i));
+    double min1 = polygon_proj_min(shape1, *(vector_t*) list_get(axes, i));
+    double max1 = polygon_proj_max(shape1, *(vector_t*) list_get(axes, i));
+    double min2 = polygon_proj_min(shape2, *(vector_t*) list_get(axes, i));
+    double max2 = polygon_proj_max(shape2, *(vector_t*) list_get(axes, i));
     if ((max2 < min1) || (max1 < min2)) {
-      return (collision_info_t){false, {0,0}, false};
-    }
-    else {
-      double min = find_min(fabs(max2 - min1), fabs(max1 - min2));
-      if (min < overlap) {
-        overlap = min;
-        *collision_axis = *(vector_t *)(list_get(axes, i));
-      }
-    }
+         return info;
+       }
+       else {
+         double min = find_min(fabs(max2 - min1), fabs(max1 - min2));
+         if (min < overlap) {
+           overlap = min;
+           collision_axis = *(vector_t *)(list_get(axes, i));
+         }
+       }
   }
-  return (collision_info_t){true, *collision_axis, true};
+  return (collision_info_t){true, collision_axis};
 }
 
 double find_min(double first, double second) {
@@ -39,22 +41,19 @@ double find_min(double first, double second) {
   }
   return second;
 }
-vector_t *edge_perp(vector_t *vec) {
+vector_t *edge_perp(vector_t vec) {
   vector_t *vec_normal = malloc(sizeof(vector_t));
-  vec_normal->x =  -1 * vec->y;
-  vec_normal->y = vec->x;
+  vec_normal->x =  -1 * vec.y;
+  vec_normal->y = vec.x;
   return vec_normal;
 }
-
 list_t *get_axes1(list_t *shape) {
   size_t len = list_size(shape);
   list_t *result = list_init(len, free);
   for (size_t i = 0; i < len; i++) {
-    vector_t *vec = malloc(sizeof(vector_t));
-    *vec = *(vector_t *)(list_get(shape, i % len));
-    *vec = vec_subtract(*vec, *(vector_t *)(list_get(shape, (i + 1) % len)));
-    vector_t* vec_normal = edge_perp(vec);
-    list_add(result, (void *) vec_normal);
+    vector_t vec = *(vector_t *)(list_get(shape, i % len));
+    vec = vec_subtract(vec, *(vector_t *)(list_get(shape, (i + 1) % len)));
+    list_add(result, (void *) edge_perp(vec));
   }
   return result;
 }
@@ -71,25 +70,21 @@ list_t *get_axes2(list_t *shape1, list_t *shape2) {
   return result;
 }
 
-double vertex_proj(vector_t *vertex, vector_t *line) {
-  return vec_dot(*vertex, *line);
-}
-
-double polygon_proj_min(list_t *shape, vector_t *line) {
-  double min = vec_dot(*((vector_t*) list_get(shape, 0)), *line);
+double polygon_proj_min(list_t *shape, vector_t line) {
+  double min = vec_dot(*(vector_t*) list_get(shape, 0), line);
   for (size_t i = 0; i < list_size(shape); i++) {
-    if (vec_dot(*((vector_t*) list_get(shape, i)), *line) < min) {
-      min = vec_dot(*((vector_t*) list_get(shape, i)), *line);
+    if (vec_dot(*((vector_t*) list_get(shape, i)), line) < min) {
+      min = vec_dot(*((vector_t*) list_get(shape, i)), line);
     }
   }
   return min;
 }
 
-double polygon_proj_max(list_t *shape, vector_t *line) {
-  double max = vec_dot(*((vector_t*) list_get(shape, 0)), *line);
+double polygon_proj_max(list_t *shape, vector_t line) {
+  double max = vec_dot(*((vector_t*) list_get(shape, 0)), line);
   for (size_t i = 0; i < list_size(shape); i++) {
-    if (vec_dot(*((vector_t*) list_get(shape, i)), *line) > max) {
-      max = vec_dot(*((vector_t*) list_get(shape, i)), *line);
+    if (vec_dot(*((vector_t*) list_get(shape, i)), line) > max) {
+      max = vec_dot(*((vector_t*) list_get(shape, i)), line);
     }
   }
   return max;

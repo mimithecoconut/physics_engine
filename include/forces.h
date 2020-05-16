@@ -12,6 +12,7 @@
    double constant;
    body_t *body1;
    body_t *body2;
+   bool collided;
  } aux_t;
 
 /**
@@ -69,6 +70,7 @@ void drag_creator(void *aux);
 
 void collision_creator(void *aux);
 
+void impulse_creator(void *aux);
 /**
  * Adds a force creator to a scene that applies gravity between two bodies.
  * The force creator will be called each tick
@@ -83,7 +85,7 @@ void collision_creator(void *aux);
  * @param body2 the second body
  */
 
-void impulse_creator(void *aux);
+
 
 void create_newtonian_gravity(scene_t *scene, double G, body_t *body1, body_t *body2);
 
