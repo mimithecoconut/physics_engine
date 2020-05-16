@@ -67,9 +67,8 @@ void impulse_creator(void *aux) {
     body_add_impulse(bod1, vec_impulse);
     body_add_impulse(bod2, vec_multiply(-1, vec_impulse));
   }
-  else {
-    ((aux_t *) aux)->collided = false;
-  }
+  ((aux_t *) aux)->collided = find_collision(((aux_t*) aux)->body1->shape,
+    ((aux_t*) aux)->body2->shape).collided;
 }
 
 void create_newtonian_gravity(scene_t *scene, double g, body_t *body1, body_t *body2) {

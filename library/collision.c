@@ -29,6 +29,8 @@ collision_info_t find_collision(list_t *shape1, list_t *shape2) {
          if (min < overlap) {
            overlap = min;
            collision_axis = *(vector_t *)(list_get(axes, i));
+           double mag = sqrt(pow(collision_axis.x, 2) + pow(collision_axis.y, 2));
+           collision_axis = vec_multiply(1 / mag, collision_axis);
          }
        }
   }
