@@ -99,7 +99,7 @@ body_t *init_circle(double r, vector_t start) {
     }
     char *status = malloc(sizeof(char));
     *status = 'c';
-    return body_init_with_info(points, MASS, (rgb_color_t) {1, 0, 0}, status, \
+    return body_init_with_info(points, MASS, (rgb_color_t) {1, 0, 0}, status,
       free);
 }
 
@@ -132,7 +132,7 @@ body_t *init_rectangle(double width, double height, vector_t centroid, char s) {
     list_add(points, c4);
     char *status = malloc(sizeof(char));
     *status = s;
-    body_t *toReturn = body_init_with_info(points, INFINITY, \
+    body_t *toReturn = body_init_with_info(points, INFINITY,
       (rgb_color_t) {1, 0, 0}, status, free);
     body_set_centroid(toReturn, centroid);
     return toReturn;
@@ -144,11 +144,11 @@ body_t *init_rectangle(double width, double height, vector_t centroid, char s) {
  * @param scene the scene to add blocks to
  */
 void init_walls(scene_t *scene) {
-    body_t *left_wall = init_rectangle(50.0, HEIGHT, \
+    body_t *left_wall = init_rectangle(50.0, HEIGHT,
       (vector_t) {-25.0, HEIGHT / 2}, 'w');
-    body_t *right_wall = init_rectangle(50.0, HEIGHT, \
+    body_t *right_wall = init_rectangle(50.0, HEIGHT,
       (vector_t) {1025.0, HEIGHT / 2}, 'w');
-    body_t *top_wall = init_rectangle(WIDTH, 50.0, \
+    body_t *top_wall = init_rectangle(WIDTH, 50.0,
       (vector_t) {WIDTH / 2, 1025.0}, 'w');
     body_set_color(left_wall, (rgb_color_t) {1, 1, 1});
     body_set_color(right_wall, (rgb_color_t) {1, 1, 1});
@@ -167,8 +167,8 @@ void init_blocks(scene_t *scene) {
     list_t *colors = init_rainbow();
     for (int j = 0; j < ROWS; j++) {
         for (int i = 0; i < WIDTH / (BLOCK_W + BLOCK_GAP) - 1; i++) {
-            vector_t pos = (vector_t) {(BLOCK_W / 2 + BLOCK_GAP) + i * \
-              (BLOCK_W + BLOCK_GAP), HEIGHT - ((BLOCK_H / 2 + BLOCK_GAP) + j * \
+            vector_t pos = (vector_t) {(BLOCK_W / 2 + BLOCK_GAP) + i *
+              (BLOCK_W + BLOCK_GAP), HEIGHT - ((BLOCK_H / 2 + BLOCK_GAP) + j *
               (BLOCK_H + BLOCK_GAP))};
             body_t *e = init_rectangle(BLOCK_W, BLOCK_H, pos, 'b');
             body_set_color(e, *(rgb_color_t *)list_get(colors, i));
@@ -187,7 +187,7 @@ void init_blocks(scene_t *scene) {
 void add_collisions(body_t *ball, scene_t *scene) {
     for (size_t i = 0; i < scene_bodies(scene); i++) {
         if (*(char *)body_get_info(scene_get_body(scene, i)) != 'c') {
-            create_physics_collision(scene, ELASTICITY, ball, \
+            create_physics_collision(scene, ELASTICITY, ball,
               scene_get_body(scene, i));
         }
     }
@@ -203,7 +203,7 @@ void bound(body_t *paddle) {
     if (curr_pos.x + PADDLE_W / 2 > WIDTH) {
         body_set_centroid(paddle, (vector_t) {WIDTH - PADDLE_W / 2, curr_pos.y});
     }
-    else if (curr_pos.x - PADDLE_H / 2 < 0) {
+    else if (curr_pos.x - PADDLE_W / 2 < 0) {
         body_set_centroid(paddle, (vector_t) {PADDLE_W / 2, curr_pos.y});
     }
 }
@@ -266,7 +266,7 @@ void check_block_collision(scene_t *scene, body_t *ball) {
     for (size_t i = 0; i < scene_bodies(scene); i++) {
         body_t *body = scene_get_body(scene, i);
         if (*(char *)body_get_info(body) == 'b') {
-            if (find_collision(body_get_shape(body), \
+            if (find_collision(body_get_shape(body),
               body_get_shape(ball)).collided) {
                 body_remove(body);
             }
@@ -328,7 +328,7 @@ void scene_clear(scene_t *scene, list_t *b_list) {
  * @param paddle body representing paddle object
  * @param s representing current scene
  */
-void on_key(char key, key_event_type_t type, double held_time, void* paddle, \
+void on_key(char key, key_event_type_t type, double held_time, void* paddle,
   void *s) {
     double angle = body_get_orientation(paddle);
     bool press = false;

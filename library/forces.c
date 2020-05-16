@@ -69,11 +69,9 @@ void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux)
     body_add_impulse(body1, vec_impulse);
     body_add_impulse(body2, vec_multiply(-1, vec_impulse));
   }
-  else {
-    ((aux_t *) aux)->collided = true;
-  }
+  ((aux_t *) aux)->collided = find_collision(((aux_t*) aux)->body1->shape,
+    ((aux_t*) aux)->body2->shape).collided;
 }
-
 
 void impulse_creator(void *aux) {
   vector_t collision_axis = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape).axis;
