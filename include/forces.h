@@ -5,17 +5,6 @@
 #include "collision.h"
 
 /**
- * Structure to store miscellaneous information about bodies to which a force
- * is applied and constant for the force
- */
- typedef struct aux {
-   double constant;
-   body_t *body1;
-   body_t *body2;
-   bool collided;
- } aux_t;
-
-/**
  * A function called when a collision occurs.
  * @param body1 the first body passed to create_collision()
  * @param body2 the second body passed to create_collision()
@@ -25,6 +14,18 @@
  */
 typedef void (*collision_handler_t)
     (body_t *body1, body_t *body2, vector_t axis, void *aux);
+
+/**
+ * Structure to store miscellaneous information about bodies to which a force
+ * is applied and constant for the force
+ */
+ typedef struct aux {
+   double constant;
+   body_t *body1;
+   body_t *body2;
+   bool collided;
+   collision_handler_t handler;
+ } aux_t;
 
 /**
  * Calculates the force of gravity on the given objects and applies the force
@@ -52,24 +53,34 @@ void spring_creator(void *aux);
  * constants
  */
 void drag_creator(void *aux);
+/**
+ * Handles collision of two bodies
+ * Does body_remove() on collided bodies
+ *
+ * @param aux, collision axis as a vector, two collided bodies body1 and body2
+ */
+void collision_handler_1(body_t *body1, body_t *body2, vector_t axis, void *aux);
 
 /**
- * Adds a force creator to a scene that applies gravity between two bodies.
- * The force creator will be called each tick
- * to compute the Newtonian gravitational force between the bodies.
- * See
- * https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation#Vector_form.
- * The force should not be applied when the bodies are very close,
- * because its magnitude blows up as the distance between the bodies goes to 0.
+ * Passes the aux through the collision_handler_1, makes collision happen
  *
- * @param scene the scene containing the bodies
- * @param g the gravitational proportionality constant
- * @param body1 the first body
- * @param body2 the second body
+ * @param aux
  */
-
 void collision_creator(void *aux);
 
+/**
+ * Handles and applies impulses
+ *
+ * @param aux, collision axis as a vector, two collided bodies body1 and body2
+ */
+
+void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux);
+
+/**
+ * Passes the aux through the collision_handler_2, applies the impulses
+ *
+ * @param aux
+ */
 void impulse_creator(void *aux);
 /**
  * Adds a force creator to a scene that applies gravity between two bodies.

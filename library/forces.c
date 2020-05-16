@@ -39,22 +39,24 @@ void drag_creator(void *aux) {
   body_add_force(((aux_t*) aux)->body1, force);
 }
 
-void collision_creator(void *aux) {
-  if ((find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape)).collided) {
-    body_remove(((aux_t*) aux)->body1);
-    body_remove(((aux_t*) aux)->body2);
+void collision_handler_1(body_t *body1, body_t *body2, vector_t axis, void *aux){
+  if (find_collision(body1->shape, body2->shape).collided){
+    body_remove(body1);
+    body_remove(body2);
   }
 }
 
-void impulse_creator(void *aux) {
-  vector_t collision_axis = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape).axis;
+void collision_creator(void *aux) {
+  vector_t axis = (find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape)).axis;
+  ((aux_t*) aux)->handler(((aux_t*) aux)->body1, ((aux_t*) aux)->body2, axis, aux);
+}
+
+void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux){
+  double m_a = body_get_mass(body1);
+  double m_b = body_get_mass(body2);
+  double u_a = vec_dot(body_get_velocity(body1), axis);
+  double u_b = vec_dot(body_get_velocity(body2), axis);
   double elasticity = ((aux_t*) aux)->constant;
-  body_t *bod1 = ((aux_t *) aux)->body1;
-  body_t *bod2 = ((aux_t *) aux)->body2;
-  double m_a = body_get_mass(bod1);
-  double m_b = body_get_mass(bod2);
-  double u_a = vec_dot(body_get_velocity(bod1), collision_axis);
-  double u_b = vec_dot(body_get_velocity(bod2), collision_axis);
   double impulse = ((m_a * m_b)/(m_a + m_b)) * (1 + elasticity) * (u_b - u_a);
   if (m_a == INFINITY) {
     impulse = m_b * (1 + elasticity) * (u_b - u_a);
@@ -62,14 +64,22 @@ void impulse_creator(void *aux) {
   else if (m_b == INFINITY) {
     impulse = m_a * (1 + elasticity) * (u_b - u_a);
   }
-  vector_t vec_impulse = vec_multiply(impulse, collision_axis);
+  vector_t vec_impulse = vec_multiply(impulse, axis);
   if (((aux_t *) aux)->collided == false) {
-    body_add_impulse(bod1, vec_impulse);
-    body_add_impulse(bod2, vec_multiply(-1, vec_impulse));
+    body_add_impulse(body1, vec_impulse);
+    body_add_impulse(body2, vec_multiply(-1, vec_impulse));
   }
   else {
-    ((aux_t *) aux)->collided = false;
+    ((aux_t *) aux)->collided = true;
   }
+}
+
+
+void impulse_creator(void *aux) {
+  vector_t collision_axis = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape).axis;
+  body_t *bod1 = ((aux_t *) aux)->body1;
+  body_t *bod2 = ((aux_t *) aux)->body2;
+  ((aux_t*) aux)->handler(bod1, bod2, collision_axis, aux);
 }
 
 void create_newtonian_gravity(scene_t *scene, double g, body_t *body1, body_t *body2) {
@@ -78,6 +88,7 @@ void create_newtonian_gravity(scene_t *scene, double g, body_t *body1, body_t *b
   aux->body1 = body1;
   aux->body2 = body2;
   aux->collided = false;
+  aux->handler = NULL;
   scene_add_force_creator(scene, (force_creator_t) gravity_creator, \
     aux, free);
 }
@@ -88,6 +99,7 @@ void create_spring(scene_t *scene, double k, body_t *body1, body_t *body2) {
   aux->body1 = body1;
   aux->body2 = body2;
   aux->collided = false;
+  aux->handler = NULL;
   scene_add_force_creator(scene, (force_creator_t) spring_creator, \
    aux, free);
 }
@@ -98,18 +110,20 @@ void create_drag(scene_t *scene, double gamma, body_t *body) {
   aux->body1 = body;
   aux->body2 = NULL;
   aux->collided = false;
+  aux->handler = NULL;
   scene_add_force_creator(scene, (force_creator_t) drag_creator, \
   aux, free);
 }
 
-// void create_collision(scene_t *scene, body_t *body1, body_t *body2, \
-//   collision_handler_t handler, void *aux, free_func_t freer){
-//     list_t *b_list = list_init(2, (free_func_t)body_free);
-//     list_add(b_list, body1);
-//     list_add(b_list, body2);
-//     scene_add_bodies_force_creator(scene, (force_creator_t) impulse_creator, \
-//     aux, b_list, free);
-//   }
+void create_collision(scene_t *scene, body_t *body1, body_t *body2, \
+  collision_handler_t handler, void *aux, free_func_t freer){
+    ((aux_t *) aux)->handler = handler;
+    list_t *b_list = list_init(2, (free_func_t)body_free);
+    list_add(b_list, body1);
+    list_add(b_list, body2);
+    scene_add_bodies_force_creator(scene, (force_creator_t) collision_creator, \
+    aux, b_list, freer);
+  }
 
 void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2) {
   aux_t *aux = malloc(sizeof(aux_t));
@@ -117,11 +131,7 @@ void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2) 
   aux->body1 = body1;
   aux->body2 = body2;
   aux->collided = find_collision(body1->shape, body2->shape).collided;
-  list_t *b_list = list_init(2, (free_func_t)body_free);
-  list_add(b_list, body1);
-  list_add(b_list, body2);
-  scene_add_bodies_force_creator(scene, (force_creator_t) collision_creator, \
-  aux, b_list, free);
+  create_collision(scene, body1, body2, (collision_handler_t) collision_handler_1, aux, free);
 }
 
 void create_physics_collision(scene_t *scene, double elasticity, body_t *body1, body_t *body2) {
@@ -130,9 +140,5 @@ void create_physics_collision(scene_t *scene, double elasticity, body_t *body1, 
   aux->body1 = body1;
   aux->body2 = body2;
   aux->collided = find_collision(body1->shape, body2->shape).collided;
-  list_t *b_list = list_init(2, (free_func_t)body_free);
-  list_add(b_list, body1);
-  list_add(b_list, body2);
-  scene_add_bodies_force_creator(scene, (force_creator_t) impulse_creator, \
-  aux, b_list, free);
+  create_collision(scene, body1, body2, (collision_handler_t) collision_handler_2, aux, free);
 }
