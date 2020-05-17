@@ -29,6 +29,7 @@ const vector_t BALL_V_RANGE = {-500.0, 500.0};
 const vector_t BALL_POS_RANGE = {200.0, 300.0};
 const double ELASTICITY = 1.0;
 const double BALL_DELAY = 10.0;
+const double WALL_THICKNESS = 50.0;
 
 /**
  * Returns a list of rgb_color_t pointers in rainbow order
@@ -144,12 +145,12 @@ body_t *init_rectangle(double width, double height, vector_t centroid, char s) {
  * @param scene the scene to add blocks to
  */
 void init_walls(scene_t *scene) {
-    body_t *left_wall = init_rectangle(50.0, HEIGHT,
-      (vector_t) {-25.0, HEIGHT / 2}, 'w');
-    body_t *right_wall = init_rectangle(50.0, HEIGHT,
-      (vector_t) {1025.0, HEIGHT / 2}, 'w');
-    body_t *top_wall = init_rectangle(WIDTH, 50.0,
-      (vector_t) {WIDTH / 2, 1025.0}, 'w');
+    body_t *left_wall = init_rectangle(WALL_THICKNESS, HEIGHT,
+      (vector_t) {-WALL_THICKNESS / 2, HEIGHT / 2}, 'w');
+    body_t *right_wall = init_rectangle(WALL_THICKNESS, HEIGHT,
+      (vector_t) {HEIGHT + WALL_THICKNESS / 2, HEIGHT / 2}, 'w');
+    body_t *top_wall = init_rectangle(WIDTH, WALL_THICKNESS,
+      (vector_t) {WIDTH / 2, HEIGHT + WALL_THICKNESS / 2}, 'w');
     body_set_color(left_wall, (rgb_color_t) {1, 1, 1});
     body_set_color(right_wall, (rgb_color_t) {1, 1, 1});
     body_set_color(top_wall, (rgb_color_t) {1, 1, 1});
