@@ -48,7 +48,7 @@ void collision_handler_1(body_t *body1, body_t *body2, vector_t axis, void *aux)
 
 void collision_creator(void *aux) {
   vector_t axis = (find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape)).axis;
-  ((aux_t*) aux)->handler(((aux_t*) aux)->body1, ((aux_t*) aux)->body2, axis, aux);
+  ((aux_t*) aux)->handler(((aux_t*) aux)->body1, ((aux_t*) aux)->body2, axis, ((aux_t*) aux)->aux);
 }
 
 void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux){
@@ -77,7 +77,7 @@ void impulse_creator(void *aux) {
   vector_t collision_axis = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape).axis;
   body_t *bod1 = ((aux_t *) aux)->body1;
   body_t *bod2 = ((aux_t *) aux)->body2;
-  ((aux_t*) aux)->handler(bod1, bod2, collision_axis, aux);
+  ((aux_t*) aux)->handler(bod1, bod2, collision_axis, ((aux_t*) aux)->aux);
 }
 
 void create_newtonian_gravity(scene_t *scene, double g, body_t *body1, body_t *body2) {
@@ -115,12 +115,16 @@ void create_drag(scene_t *scene, double gamma, body_t *body) {
 
 void create_collision(scene_t *scene, body_t *body1, body_t *body2, \
   collision_handler_t handler, void *aux, free_func_t freer){
-    ((aux_t *) aux)->handler = handler;
+    aux_t *aux_copy = malloc(sizeof(aux_t));
+    aux_copy->body1 = body1;
+    aux_copy->body2 = body2;
+    aux_copy->aux = aux;
+    aux_copy->handler = handler;
     list_t *b_list = list_init(2, (free_func_t)body_free);
     list_add(b_list, body1);
     list_add(b_list, body2);
     scene_add_bodies_force_creator(scene, (force_creator_t) collision_creator, \
-    aux, b_list, freer);
+    aux_copy, b_list, freer);
   }
 
 void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2) {

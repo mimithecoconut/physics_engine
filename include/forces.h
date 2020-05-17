@@ -25,6 +25,7 @@ typedef void (*collision_handler_t)
    body_t *body2;
    bool collided;
    collision_handler_t handler;
+   void *aux;
  } aux_t;
 
 /**
