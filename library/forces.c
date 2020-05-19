@@ -47,8 +47,11 @@ void collision_handler_1(body_t *body1, body_t *body2, vector_t axis, void *aux)
 }
 
 void collision_creator(void *aux) {
-  vector_t axis = (find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape)).axis;
-  ((aux_t*) aux)->handler(((aux_t*) aux)->body1, ((aux_t*) aux)->body2, axis, ((aux_t*) aux)->aux);
+  collision_info_t info = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape);
+  if (info.collided) {
+    ((aux_t*) aux)->handler(((aux_t*) aux)->body1, ((aux_t*) aux)->body2, info.axis, ((aux_t*) aux)->aux);
+  }
+  ((aux_t *) aux)->collided = info.collided;
 }
 
 void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux){
@@ -69,8 +72,7 @@ void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux)
     body_add_impulse(body1, vec_impulse);
     body_add_impulse(body2, vec_multiply(-1, vec_impulse));
   }
-  ((aux_t *) aux)->collided = find_collision(((aux_t*) aux)->body1->shape,
-    ((aux_t*) aux)->body2->shape).collided;
+  ((aux_t *) aux)->collided = !((aux_t *) aux)->collided;
 }
 
 void impulse_creator(void *aux) {
@@ -132,7 +134,7 @@ void create_destructive_collision(scene_t *scene, body_t *body1, body_t *body2) 
   aux->constant = 0;
   aux->body1 = body1;
   aux->body2 = body2;
-  aux->collided = find_collision(body1->shape, body2->shape).collided;
+  aux->collided = false;
   create_collision(scene, body1, body2, (collision_handler_t) collision_handler_1, aux, free);
 }
 
@@ -141,6 +143,6 @@ void create_physics_collision(scene_t *scene, double elasticity, body_t *body1, 
   aux->constant = elasticity;
   aux->body1 = body1;
   aux->body2 = body2;
-  aux->collided = find_collision(body1->shape, body2->shape).collided;
+  aux->collided = false;
   create_collision(scene, body1, body2, (collision_handler_t) collision_handler_2, aux, free);
 }

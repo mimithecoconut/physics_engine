@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <math.h>
 
-const int LARGE = 99999;
+const int LARGE = INFINITY;
 
 collision_info_t find_collision(list_t *shape1, list_t *shape2) {
   list_t *axes = get_axes2(shape1, shape2);
