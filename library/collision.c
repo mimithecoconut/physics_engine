@@ -12,7 +12,7 @@ const int LARGE = INFINITY;
 
 collision_info_t find_collision(list_t *shape1, list_t *shape2) {
   list_t *axes = get_axes2(shape1, shape2);
-  int overlap = LARGE;
+  double overlap = LARGE;
   vector_t collision_axis = {0.0, 0.0};
   collision_info_t info = (collision_info_t){false, collision_axis};
   //vector_t *collision_axis = malloc(sizeof(vector_t));

@@ -75,13 +75,6 @@ void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux)
   ((aux_t *) aux)->collided = !((aux_t *) aux)->collided;
 }
 
-void impulse_creator(void *aux) {
-  vector_t collision_axis = find_collision((((aux_t*) aux)->body1)->shape, (((aux_t*) aux)->body2)->shape).axis;
-  body_t *bod1 = ((aux_t *) aux)->body1;
-  body_t *bod2 = ((aux_t *) aux)->body2;
-  ((aux_t*) aux)->handler(bod1, bod2, collision_axis, ((aux_t*) aux)->aux);
-}
-
 void create_newtonian_gravity(scene_t *scene, double g, body_t *body1, body_t *body2) {
   aux_t *aux = malloc(sizeof(aux_t));
   aux->constant = g;

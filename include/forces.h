@@ -78,12 +78,6 @@ void collision_creator(void *aux);
 void collision_handler_2(body_t *body1, body_t *body2, vector_t axis, void *aux);
 
 /**
- * Passes the aux through the collision_handler_2, applies the impulses
- *
- * @param aux
- */
-void impulse_creator(void *aux);
-/**
  * Adds a force creator to a scene that applies gravity between two bodies.
  * The force creator will be called each tick
  * to compute the Newtonian gravitational force between the bodies.
