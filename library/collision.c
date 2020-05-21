@@ -15,7 +15,6 @@ collision_info_t find_collision(list_t *shape1, list_t *shape2) {
   double overlap = LARGE;
   vector_t collision_axis = {0.0, 0.0};
   collision_info_t info = (collision_info_t){false, collision_axis};
-  //vector_t *collision_axis = malloc(sizeof(vector_t));
   for (size_t i = 0; i < list_size(axes); i++) {
     double min1 = polygon_proj_min(shape1, *(vector_t*) list_get(axes, i));
     double max1 = polygon_proj_max(shape1, *(vector_t*) list_get(axes, i));
