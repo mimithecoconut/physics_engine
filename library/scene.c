@@ -45,7 +45,9 @@ int force_is_removed(force_t *f){
 }
 
 void force_free(force_t *f) {
-  f->freer(f->aux);
+  if (f->freer != NULL) {
+    f->freer(f->aux);
+  }
   free(f);
 }
 
